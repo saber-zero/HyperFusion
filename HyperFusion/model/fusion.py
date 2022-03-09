@@ -34,14 +34,18 @@ class Fusion(BaseModel):
             parser.add_argument('--lambda_H', type=float, default=0.0, help='non')
             parser.add_argument('--num_theta', type=int, default=128)
             parser.add_argument('--n_res', type=int, default=3)
-            parser.add_argument('--avg_crite', type=str, default='No')
+            # parser.add_argument('--avg_crite', type=str, default='No')
+            parser.add_argument('--avg_crite', action="store_true")
             # parser.add_argument('--ThetaModel', type=str, default='Normal', help='Normal Dirichlet')
             # parser.add_argument('--pixelwiseloss', type=str, default='l1', help='l2, l1')
-            parser.add_argument('--useGan', type=str, default='Yes', help='Yes No')
+            # parser.add_argument('--useGan', type=str, default='Yes', help='Yes No')
+            parser.add_argument('--useGan', action="store_true")
             # parser.add_argument('--isRealFusion', type=str, default='No', help='Yes No')
-            parser.add_argument('--isCalSP', type=str, default='No')
+            # parser.add_argument('--isCalSP', type=str, default='No')
+            parser.add_argument('--isCalSP', action="store_true")
             # parser.add_argument('--all_band_calSP', type=str, default='No', help='is using all hr bands cal SP')
-            parser.add_argument("--useSoftmax", type=str, default='Yes')
+            # parser.add_argument("--useSoftmax", type=str, default='Yes')
+            parser.add_argument("--useSoftmax", action='store_false')
         return parser
 
 
@@ -75,7 +79,7 @@ class Fusion(BaseModel):
                                                     gpu_ids=self.gpu_ids)
         
         # LOSS
-        if self.opt.avg_crite == "No":
+        if self.opt.avg_crite == False:
             self.criterionL1Loss = torch.nn.L1Loss(size_average=False).to(self.device)
         else:
             self.criterionL1Loss = torch.nn.L1Loss(size_average=True).to(self.device)
@@ -111,7 +115,7 @@ class Fusion(BaseModel):
                                             lr=lr*0.2,betas=(0.9, 0.999))
         self.optimizers.append(self.optimizer_G_PSF)
         
-        if self.opt.isCalSP == 'Yes':
+        if self.opt.isCalSP == True:
             # 0.2
             self.optimizer_G_HR2MSI = torch.optim.Adam(itertools.chain(self.net_G_HR2MSI.parameters()),
                                                        lr=lr*0.2,betas=(0.9, 0.999))

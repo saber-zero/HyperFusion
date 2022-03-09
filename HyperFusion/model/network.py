@@ -4,7 +4,6 @@ from torch.nn import init
 import functools
 from torch.optim import lr_scheduler
 import torch.nn.functional as F
-from .spectralnorm import SpectralNorm
 
 def get_scheduler(optimizer, opt):
     if opt.lr_policy == 'lambda':
@@ -110,14 +109,14 @@ class ResBlock(nn.Module):
         out = self.net(x)
         return out + x
 
-def define_msi2s(input_ch, output_ch,gpu_ids, n_res, init_type='kaiming', init_gain=0.02, useSoftmax='Yes'):
+def define_msi2s(input_ch, output_ch,gpu_ids, n_res, init_type='kaiming', init_gain=0.02, useSoftmax=True):
 
     net = Msi2Delta(input_c=input_ch, output_c=output_ch, ngf=64, n_res=n_res, useSoftmax=useSoftmax)
 
     return init_net(net, init_type, init_gain, gpu_ids)
 
 class Msi2Delta(nn.Module):
-    def __init__(self, input_c, output_c, ngf=64, n_res=3, useSoftmax='Yes'):
+    def __init__(self, input_c, output_c, ngf=64, n_res=3, useSoftmax=True):
         super(Msi2Delta, self).__init__()
         self.net = nn.Sequential(
             nn.Conv2d(input_c, ngf*2, 1, 1, 0),
@@ -137,9 +136,9 @@ class Msi2Delta(nn.Module):
         self.usefostmax = useSoftmax
 
     def forward(self, x):
-        if self.usefostmax == "Yes":
+        if self.usefostmax == True:
             return self.softmax(self.net(x))
-        elif self.usefostmax == 'No':
+        elif self.usefostmax == False:
             return self.net(x)
         # return self.net_out(self.net_mid(self.net_in(x)))
 
@@ -158,13 +157,13 @@ class S2Img(nn.Module):
     def forward(self, x):
         return self.net(x)
 
-def define_lr2s(input_ch, output_ch,gpu_ids, n_res, init_type='kaiming', init_gain=0.02, useSoftmax='Yes'):
+def define_lr2s(input_ch, output_ch,gpu_ids, n_res, init_type='kaiming', init_gain=0.02, useSoftmax=True):
 
     net = Lr2Delta(input_c=input_ch, output_c=output_ch, ngf=64, n_res=n_res, useSoftmax=useSoftmax)
     return init_net(net, init_type, init_gain, gpu_ids)
 
 class Lr2Delta(nn.Module):
-    def __init__(self, input_c, output_c, ngf=64, n_res=3, useSoftmax='Yes'):
+    def __init__(self, input_c, output_c, ngf=64, n_res=3, useSoftmax=True):
         super(Lr2Delta, self).__init__()
         self.net = nn.Sequential(
             nn.Conv2d(input_c, ngf*2, 1, 1, 0),
@@ -183,9 +182,9 @@ class Lr2Delta(nn.Module):
         self.net_out = nn.Conv2d(ngf*2, output_c, 1, 1, 0)
         self.usesoftmax = useSoftmax
     def forward(self, x):
-        if self.usesoftmax == "Yes":
+        if self.usesoftmax == True:
             return self.softmax(self.net(x))
-        elif self.usesoftmax == 'No':
+        elif self.usesoftmax == False:
             return self.net(x)
         # return self.net(x).clamp_(0,1)
         # return self.net_out(self.net_mid(self.net_in(x)))
@@ -207,9 +206,9 @@ class PSF(nn.Module):
         return torch.cat([self.net(x[:,i,:,:].view(batch,1,height,weight)) for i in range(channel)], 1)
 
 def define_hr2msi(args, hsi_channels, msi_channels, sp_matrix, sp_range, gpu_ids, init_type='mean_channel', init_gain=0.02):
-    if args.isCalSP == "No":
+    if args.isCalSP == False:
         net = matrix_dot_hr2msi(sp_matrix)
-    elif args.isCalSP == "Yes":
+    elif args.isCalSP == True:
         net = convolution_hr2msi(hsi_channels, msi_channels, sp_range)
     return init_net(net, init_type, init_gain, gpu_ids)
 

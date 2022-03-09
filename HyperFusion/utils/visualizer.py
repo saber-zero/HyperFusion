@@ -249,8 +249,8 @@ class Visualizer():
         savefiles.close()
         # np.save(os.path.join(self.save_hhsi_path, "real_{}.npy".format(image_name[0])), real_hsi)
         # np.save(os.path.join(self.save_hhsi_path, "rec_{}.npy".format(image_name[0])), rec_hsi)
-        io.savemat(os.path.join(self.save_hhsi_path, "real_{}".format(image_name[0])), {"RealHSI":real_hsi.transpose(1,2,0)})
-        io.savemat(os.path.join(self.save_hhsi_path, "rec_{}".format(image_name[0])), {"ReclHSI":rec_hsi.transpose(1,2,0)})
+        io.savemat(os.path.join(self.save_hhsi_path, "real_{}.mat".format(image_name[0])), {"RealHSI":real_hsi.transpose(1,2,0)})
+        io.savemat(os.path.join(self.save_hhsi_path, "rec_{}".mat.format(image_name[0])), {"ReclHSI":rec_hsi.transpose(1,2,0)})
 
 
 
