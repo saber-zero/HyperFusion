@@ -1,4 +1,4 @@
-# HyperFusion
+# HyCoNet - Coupled Convolutional Neural Network With Adaptive Response Function Learning for Unsupervised Hyperspectral Super Resolution
 
 Code for the paper: Coupled Convolutional Neural Network With Adaptive Response Function Learning for Unsupervised Hyperspectral Super Resolution
 
